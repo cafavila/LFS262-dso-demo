@@ -41,7 +41,7 @@ pipeline {
         stage('OCI Image BnP') {
           steps {
             container('kaniko') {
-                sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/v2/cafavila/dsodemo'
+                sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=registry.hub.docker.com/v2/cafavila/dsodemo'
               }
             }
           }
