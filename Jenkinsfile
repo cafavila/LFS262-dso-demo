@@ -55,17 +55,17 @@ pipeline {
             }
           }
         }
-        stage('SAST') {
-          steps {
-            container('slscan') {
-              sh 'scan --type java,depscan --build'
-            }
-          }
-          post {
-            success {
-              archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*', fingerprint: true, onlyIfSuccessful: true
-            }
-          }
+      }
+    }
+    stage('SAST') {
+      steps {
+        container('slscan') {
+          sh 'scan --type java,depscan --build'
+        }
+      }
+      post {
+        success {
+          archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*', fingerprint: true, onlyIfSuccessful: true
         }
       }
     }
@@ -87,7 +87,24 @@ pipeline {
           }
       }
     }
-
+    stage('Analisis de Imagen') {
+      parallel {
+        stage('Image Linting') {
+          steps {
+            container('docker-tools') {
+              sh 'dockle hub.docker.com/r/cafavila/dsodemo'
+            }
+          }
+        }
+        stage('Image Scan') {
+          steps {
+            container('docker-tools') {
+              sh 'trivy image --exit-code 1 cafavila/dsodemo'
+            }
+          }
+        }
+      }
+    }
     stage('Deploy to Dev') {
       steps {
         // TODO
